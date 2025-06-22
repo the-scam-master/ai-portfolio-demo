@@ -1,0 +1,18 @@
+{
+  "routes": [
+    {
+      "src": "/api/chat",
+      "methods": ["POST"],
+      "dest": "/api/chat.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ],
+  "build": {
+    "env": {
+      "PYTHON_VERSION": "3.9"
+    }
+  }
+}
