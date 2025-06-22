@@ -1,133 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tanmay Kalbande - AI Portfolio Assistant</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanmay Kalbande - AI Portfolio Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="header">
-            <div class="header-content">
-                <div class="avatar-header">T</div>
-                <div class="header-text">
-                    <h1>Tanmay Kalbande</h1>
-                    <p>AI Portfolio Assistant</p>
-                </div>
-            </div>
+  <div class="chat-container">
+    <div class="header">
+      <div class="header-content">
+        <div class="avatar-header">T</div>
+        <div class="header-text">
+          <h1>Tanmay Kalbande</h1>
+          <p>AI Portfolio Assistant</p>
         </div>
-
-        <div id="chat-messages" class="chat-messages">
-            <!-- Initial Message will be added via JS -->
-        </div>
-
-        <div class="input-area">
-            <input
-                type="text"
-                id="user-input"
-                placeholder="Ask about my projects, skills, or experience..."
-                autocomplete="off"
-            >
-            <button id="send-btn" aria-label="Send Message">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="currentColor"/>
-                </svg>
-            </button>
-        </div>
+      </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatMessages = document.getElementById('chat-messages');
-            const userInput = document.getElementById('user-input');
-            const sendBtn = document.getElementById('send-btn');
-            
-            // System prompt is now handled by the backend.
-            // This makes the frontend cleaner and more secure.
+    <div id="chat-messages" class="chat-messages"></div>
 
-            // UI functions
-            function addMessageToUI(content, sender) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${sender}-message`;
-                
-                const sanitizedContent = content.replace(/</g, "<").replace(/>/g, ">");
+    <div class="input-area">
+      <input
+        type="text"
+        id="user-input"
+        placeholder="Ask about my projects, skills, or experience..."
+        autocomplete="off"
+        maxlength="300"
+      />
+      <button id="send-btn" aria-label="Send Message">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+          <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"
+                fill="currentColor" />
+        </svg>
+      </button>
+    </div>
+  </div>
 
-                messageDiv.innerHTML = `
-                    <div class="avatar">${sender === 'user' ? 'Y' : 'T'}</div>
-                    <div class="content">
-                        <p>${sanitizedContent.replace(/\n/g, '<br>')}</p>
-                        <div class="timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                    </div>
-                `;
-
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-
-            function showInitialMessage() {
-                 addMessageToUI("Hi! I'm an AI assistant representing Tanmay Kalbande. Feel free to ask me anything about his skills, projects, and experience!", 'bot');
-            }
-
-            // Send message function
-            async function sendMessage() {
-                const message = userInput.value.trim();
-                if (!message) return;
-
-                addMessageToUI(message, 'user');
-                userInput.value = '';
-                userInput.focus();
-                
-                const typingIndicator = showTypingIndicator();
-
-                try {
-                    // The fetch call is now simpler. We only send the user's message.
-                    const response = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message }) // Only send the message
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`API Error: ${response.statusText}`);
-                    }
-
-                    const data = await response.json();
-                    addMessageToUI(data.reply, 'bot');
-                } catch (error) {
-                    console.error(error);
-                    addMessageToUI("Sorry, I'm having trouble connecting right now. Please try again later.", 'bot');
-                } finally {
-                    typingIndicator.remove();
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
-            }
-            
-            function showTypingIndicator() {
-                const indicator = document.createElement('div');
-                indicator.className = 'message bot-message typing-indicator';
-                indicator.innerHTML = `
-                     <div class="avatar">T</div>
-                     <div class="content">
-                        <div class="dot-flashing"></div>
-                     </div>
-                `;
-                chatMessages.appendChild(indicator);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                return indicator;
-            }
-
-            // Event listeners
-            sendBtn.addEventListener('click', sendMessage);
-            userInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') sendMessage();
-            });
-            
-            showInitialMessage();
-        });
-    </script>
+  <script src="script.js"></script>
 </body>
 </html>
