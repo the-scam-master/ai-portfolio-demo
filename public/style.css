@@ -1,14 +1,16 @@
 :root {
   --primary-color: #0a84ff;
   --primary-hover: #006ae0;
-  --bg-dark: #1c1c1e;
-  --input-bg: #2c2c2e;
-  --text-color: #f2f2f7;
+  --bg-dark: #121212;
+  --input-bg: #1e1e1e;
+  --text-color: #e0e0e0;
   --secondary-text: #a1a1aa;
-  --bot-bg: #2c2c2e;
+  --bot-bg: #1e1e1e;
   --user-bg: #0a84ff;
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   --font-family: 'Inter', sans-serif;
+  --bg-pattern-1: rgba(74, 222, 128, 0.1);
+  --bg-pattern-2: rgba(96, 165, 250, 0.1);
 }
 
 * {
@@ -25,11 +27,22 @@ html {
 
 body {
   background-color: var(--bg-dark);
+  background-image:
+    radial-gradient(circle at 20px 20px, var(--bg-pattern-1) 1px, transparent 0),
+    radial-gradient(circle at 60px 60px, var(--bg-pattern-2) 1px, transparent 0);
+  background-size: 80px 80px;
   height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0.5rem;
+  animation: backgroundShift 20s linear infinite;
+}
+
+@keyframes backgroundShift {
+  0% { background-position: 0 0; }
+  50% { background-position: 40px 40px; }
+  100% { background-position: 80px 80px; }
 }
 
 .chat-container {
