@@ -1,9 +1,14 @@
 import os
 import json
+from flask import Flask, request, jsonify
 import google.generativeai as genai
-from http.server import BaseHTTPRequestHandler
+from dotenv import load_dotenv
 
-# --- NEW OPTIMIZED SYSTEM PROMPT ---
+load_dotenv()
+
+app = Flask(__name__)
+
+# --- SYSTEM PROMPT ---
 SYSTEM_PROMPT = """
 # IDENTITY & PERSONA
 You ARE Tanmay Kalbande, a professional and enthusiastic Data Scientist. Your persona is helpful, knowledgeable, and you communicate in a friendly, first-person chat style ("I", "my", "me"). Keep responses conversational and engaging.
@@ -57,61 +62,43 @@ You ARE Tanmay Kalbande, a professional and enthusiastic Data Scientist. Your pe
 4.  **Be Proactive with Links**: When a user asks about projects, my resume, or how to connect, provide the relevant link from the KNOWLEDGE BASE. Example: "You can check out all my projects on my GitHub: [link]".
 5.  **Acknowledge Your Nature (If Asked)**: If asked directly "Are you an AI?", be transparent. Respond: "I'm an AI assistant built to represent Tanmay and his work. I can help you learn all about his skills, projects, and experience!"
 """
-# --- END OF SYSTEM PROMPT ---
+# --- END SYSTEM PROMPT ---
 
-
-# Initialize Gemini
-# It's good practice to add a check for the API key
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+# Set up Gemini
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY environment variable not set!")
+    raise RuntimeError("GEMINI_API_KEY not found in environment.")
+
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemma-3-27b-it')
+model = genai.GenerativeModel("gemma-3-27b-it")
 
+@app.route("/api/chat", methods=["POST"])
+def chat():
+    try:
+        data = request.get_json()
+        user_message = data.get("message", "").strip()
 
-class handler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        try:
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            data = json.loads(post_data)
-            user_message = data.get('message')
+        if not user_message:
+            return jsonify({"error": "Message field is required."}), 400
 
-            if not user_message:
-                self.send_error(400, "Bad Request: 'message' field is required.")
-                return
+        prompt = f"{SYSTEM_PROMPT}\n\n---\n\nCurrent conversation:\nUser: {user_message}\nTanmay:"
 
-            # Construct the final prompt for the model
-            # This is much cleaner now.
-            prompt = f"{SYSTEM_PROMPT}\n\n---\n\nCurrent conversation:\nUser: {user_message}\nTanmay:"
-
-            # Generate response
-            response = model.generate_content(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
-                    temperature=0.7,
-                    top_p=0.85,
-                    top_k=40,
-                    max_output_tokens=512
-                )
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.7,
+                top_p=0.85,
+                top_k=40,
+                max_output_tokens=512
             )
+        )
 
-            # Send response
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            # Use .parts[0].text for more robust text extraction
-            reply_text = response.parts[0].text if response.parts else "I'm sorry, I couldn't generate a response."
-            self.write(json.dumps({
-                'reply': reply_text
-            }))
+        reply_text = response.parts[0].text if response.parts else "Sorry, I couldn't generate a response."
+        return jsonify({"reply": reply_text})
 
-        except json.JSONDecodeError:
-            self.send_error(400, "Bad Request: Invalid JSON.")
-        except Exception as e:
-            # Log the error for debugging on the server
-            print(f"Error generating response: {e}")
-            self.send_error(500, f"Internal Server Error: Could not generate response.")
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
-    def write(self, content):
-        self.wfile.write(content.encode('utf-8'))
+# Needed for Vercel to detect entrypoint
+app_handler = app
