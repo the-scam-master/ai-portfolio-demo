@@ -47,14 +47,6 @@ body {
   100% { background-position: 80px 80px; }
 }
 
-.content a {
-  color: #4ea1ff;
-  text-decoration: underline;
-}
-.content a:hover {
-  color: #88c7ff;
-}
-
 .chat-container {
   width: 100%;
   max-width: 800px;
@@ -72,6 +64,7 @@ body {
 .header {
   padding: 1rem 1.25rem;
   border-bottom: 1px solid #2e2e2e;
+  flex-shrink: 0;
 }
 
 .header-content {
@@ -156,6 +149,9 @@ body {
   border-radius: 16px;
   line-height: 1.5;
   font-size: 0.95rem;
+  /* Fix: Prevent long words/URLs from overflowing the container */
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .user-message .content {
@@ -178,6 +174,7 @@ body {
   padding: 0.75rem 1rem;
   border-top: 1px solid #2e2e2e;
   background: var(--bg-dark);
+  flex-shrink: 0;
 }
 
 .input-area input {
@@ -189,6 +186,7 @@ body {
   color: var(--text-color);
   font-size: 1rem;
   outline: none;
+  min-width: 0; /* Fix for flexbox shrinking issues */
 }
 
 .input-area input:focus {
@@ -208,44 +206,75 @@ body {
   justify-content: center;
   align-items: center;
   transition: background 0.2s ease;
+  flex-shrink: 0;
 }
 
 .input-area button:hover {
   background: var(--primary-hover);
 }
 
-/* Markdown */
-.content :is(h1, h2, h3, strong, em, code, pre, ul, ol, a) {
-  color: inherit;
+/* --- Markdown and Content Styling --- */
+.content a {
+  color: #88c7ff;
+  text-decoration: underline;
+}
+.content a:hover {
+  color: #a7d7ff;
 }
 .content code {
   background: #333;
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-family: monospace;
+  font-size: 0.85em;
+  /* Allow inline code to break to prevent overflow */
+  word-break: break-all;
+}
+.content pre {
+  background: #0d0d0d;
+  border: 1px solid #2e2e2e;
+  padding: 0.75rem;
+  border-radius: 8px;
+  /* Add horizontal scrollbar if code is too wide */
+  overflow-x: auto;
+  white-space: pre;
+}
+.content pre code {
+  background: none;
+  padding: 0;
+  font-size: 1em;
+  word-break: normal; /* Use scrollbar instead of breaking */
 }
 
-.retry-button {
-  font-size: 0.8rem;
-  color: var(--primary-color);
-  margin-top: 0.25rem;
-  cursor: pointer;
-  text-align: right;
-}
-
-/* Mobile responsive */
+/* --- Responsive Design --- */
 @media (max-width: 768px) {
   html {
     font-size: 15px;
+  }
+  body {
+    /* Remove body padding to allow container to be full screen */
+    padding: 0;
   }
   .chat-container {
     height: 100dvh;
     max-height: 100dvh;
     border-radius: 0;
+    /* Fix: Remove the border on mobile */
+    border: none;
+  }
+  /* Fix: Remove header and input area borders on mobile */
+  .header {
+    border-bottom: 1px solid #2e2e2e;
+  }
+  .input-area {
+    border-top: 1px solid #2e2e2e;
   }
 }
 @media (max-width: 480px) {
   html {
     font-size: 14px;
+  }
+  .header-text h1 {
+    font-size: 1.1rem;
   }
 }
