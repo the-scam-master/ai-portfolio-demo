@@ -33,7 +33,7 @@ body {
     radial-gradient(circle at 60px 60px, var(--bg-pattern-2) 1px, transparent 0);
   background-size: 80px 80px;
   animation: backgroundShift 20s linear infinite;
-  height: 100dvh;
+  height: 100svh; /* ✅ safer on mobile */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -156,6 +156,7 @@ body {
   border-radius: 16px;
   line-height: 1.5;
   font-size: 0.95rem;
+  word-wrap: break-word;
 }
 
 .user-message .content {
@@ -178,6 +179,9 @@ body {
   padding: 0.75rem 1rem;
   border-top: 1px solid #2e2e2e;
   background: var(--bg-dark);
+  position: sticky; /* ✅ sticks above keyboard */
+  bottom: 0;
+  z-index: 10;
 }
 
 .input-area input {
@@ -214,7 +218,7 @@ body {
   background: var(--primary-hover);
 }
 
-/* Markdown */
+/* Markdown styling */
 .content :is(h1, h2, h3, strong, em, code, pre, ul, ol, a) {
   color: inherit;
 }
@@ -223,6 +227,12 @@ body {
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
   font-family: monospace;
+}
+.content pre {
+  background: #222;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
 }
 
 .retry-button {
@@ -233,7 +243,7 @@ body {
   text-align: right;
 }
 
-/* Mobile responsive */
+/* Responsive */
 @media (max-width: 768px) {
   html {
     font-size: 15px;
