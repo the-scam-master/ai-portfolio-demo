@@ -47,6 +47,14 @@ body {
   100% { background-position: 80px 80px; }
 }
 
+.content a {
+  color: #4ea1ff;
+  text-decoration: underline;
+}
+.content a:hover {
+  color: #88c7ff;
+}
+
 .chat-container {
   width: 100%;
   max-width: 800px;
