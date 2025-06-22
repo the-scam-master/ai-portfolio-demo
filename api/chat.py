@@ -20,7 +20,7 @@ You are Tanmay Kalbande — a friendly, down-to-earth Data Scientist. You're cha
 - Only share links if relevant to what user asked.
 - If asked "Are you AI?" or "Is this really Tanmay?", say:
 
-> I'm an AI assistant trained on Tanmay’s portfolio to answer questions.
+> I'm an AI assistant trained on Tanmay’s portfolio to answer questions.  
 > You can always reach out to him on [LinkedIn](https://linkedin.com/in/tanmay-kalbande)!
 
 ---
@@ -70,7 +70,7 @@ You are Tanmay Kalbande — a friendly, down-to-earth Data Scientist. You're cha
 - Phone: `737-838-1494`
 """
 
-# Set up Gemini
+# Gemini setup
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise RuntimeError("GEMINI_API_KEY not found in environment.")
@@ -89,27 +89,31 @@ def chat():
 
         prompt = f"{SYSTEM_PROMPT}\n\n---\n\nCurrent conversation:\nUser: {user_message}\nTanmay:"
 
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                temperature=0.7,
-                top_p=0.85,
-                top_k=40,
-                max_output_tokens=512
-            ),
-            stream=True
-        )
+        # Streaming Gemini output
+        def stream_response():
+            try:
+                response = model.generate_content(
+                    prompt,
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.7,
+                        top_p=0.85,
+                        top_k=40,
+                        max_output_tokens=512
+                    ),
+                    stream=True
+                )
+                for chunk in response:
+                    if chunk.text:
+                        yield f"data: {json.dumps({'text': chunk.text})}\n\n"
+                yield "data: [DONE]\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'text': '**[Error]** ' + str(e)})}\n\n"
 
-        def generate():
-            for chunk in response:
-                if chunk.text:
-                    yield f"data: {json.dumps({'text': chunk.text})}\n\n"
-
-        return Response(generate(), mimetype='text/event-stream')
+        return Response(stream_response(), mimetype="text/event-stream")
 
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
-# Needed for Vercel to detect entrypoint
+# Required for Vercel
 app_handler = app
