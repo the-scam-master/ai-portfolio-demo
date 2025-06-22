@@ -79,10 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parsed = JSON.parse(dataStr);
                 if (parsed.text) {
                   if (isFirstChunk) {
-                    botBubble.innerHTML = ''; // clear "Typing..." on first chunk
+                    botBubble.innerHTML = '';
                     isFirstChunk = false;
                   }
-                  botBubble.innerHTML += parsed.text;
+                  botBubble.innerHTML += marked.parseInline(parsed.text);
                   scrollToBottom();
                 }
               } catch (err) {
@@ -103,6 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') sendMessage();
   });
 
-  // Optional: Remove initial static welcome message if streaming is used
-  // createMessageElement('bot', "Hi! I'm an AI assistant representing Tanmay Kalbande. Ask me about his skills or projects!");
+  // Optional welcome message (disable if using streaming UX only)
+  // createMessageElement('bot', "Hi! I'm an AI assistant representing Tanmay Kalbande. Ask me anything!");
 });
