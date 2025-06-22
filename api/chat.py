@@ -5,7 +5,6 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
-
 app = Flask(__name__)
 
 # --- SYSTEM PROMPT ---
@@ -70,7 +69,7 @@ You are Tanmay Kalbande — a friendly, down-to-earth Data Scientist. You're cha
 - Phone: `737-838-1494`
 """
 
-# Gemini setup
+# Set up Gemini (Gemma model)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise RuntimeError("GEMINI_API_KEY not found in environment.")
@@ -89,31 +88,32 @@ def chat():
 
         prompt = f"{SYSTEM_PROMPT}\n\n---\n\nCurrent conversation:\nUser: {user_message}\nTanmay:"
 
-        # Streaming Gemini output
-        def stream_response():
-            try:
-                response = model.generate_content(
-                    prompt,
-                    generation_config=genai.types.GenerationConfig(
-                        temperature=0.7,
-                        top_p=0.85,
-                        top_k=40,
-                        max_output_tokens=512
-                    ),
-                    stream=True
-                )
-                for chunk in response:
-                    if chunk.text:
-                        yield f"data: {json.dumps({'text': chunk.text})}\n\n"
-                yield "data: [DONE]\n\n"
-            except Exception as e:
-                yield f"data: {json.dumps({'text': '**[Error]** ' + str(e)})}\n\n"
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.7,
+                top_p=0.85,
+                top_k=40,
+                max_output_tokens=512
+            ),
+            stream=True
+        )
 
-        return Response(stream_response(), mimetype="text/event-stream")
+        def generate():
+            for chunk in response:
+                try:
+                    if hasattr(chunk, "parts") and chunk.parts:
+                        for part in chunk.parts:
+                            if hasattr(part, "text") and part.text:
+                                yield f"data: {json.dumps({'text': part.text})}\n\n"
+                except Exception as stream_err:
+                    print(f"[Chunk Error] {stream_err}")
+
+        return Response(generate(), mimetype='text/event-stream')
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"[Server Error] {e}")
         return jsonify({"error": "Internal server error"}), 500
 
-# Required for Vercel
+# Required for Vercel deployment
 app_handler = app
