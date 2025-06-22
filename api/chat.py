@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 import google.generativeai as genai
 from dotenv import load_dotenv
 
@@ -20,7 +20,7 @@ You are Tanmay Kalbande — a friendly, down-to-earth Data Scientist. You're cha
 - Only share links if relevant to what user asked.
 - If asked "Are you AI?" or "Is this really Tanmay?", say:
 
-> I'm an AI assistant trained on Tanmay’s portfolio to answer questions.  
+> I'm an AI assistant trained on Tanmay’s portfolio to answer questions.
 > You can always reach out to him on [LinkedIn](https://linkedin.com/in/tanmay-kalbande)!
 
 ---
@@ -70,7 +70,6 @@ You are Tanmay Kalbande — a friendly, down-to-earth Data Scientist. You're cha
 - Phone: `737-838-1494`
 """
 
-
 # Set up Gemini
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
@@ -97,11 +96,16 @@ def chat():
                 top_p=0.85,
                 top_k=40,
                 max_output_tokens=512
-            )
+            ),
+            stream=True
         )
 
-        reply_text = response.parts[0].text if response.parts else "Sorry, I couldn't generate a response."
-        return jsonify({"reply": reply_text})
+        def generate():
+            for chunk in response:
+                if chunk.text:
+                    yield f"data: {json.dumps({'text': chunk.text})}\n\n"
+
+        return Response(generate(), mimetype='text/event-stream')
 
     except Exception as e:
         print(f"Error: {e}")
