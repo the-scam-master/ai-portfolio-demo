@@ -3,7 +3,7 @@
     {
       "src": "/api/chat",
       "methods": ["POST"],
-      "dest": "/api/chat.py"
+      "dest": "api/chat.py"
     },
     {
       "src": "/(.*)",
