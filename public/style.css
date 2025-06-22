@@ -1,16 +1,17 @@
 :root {
-  --primary-color: #0a84ff;
-  --primary-hover: #006ae0;
+  --primary-color: #60a5fa;
+  --primary-hover: #3b82f6;
   --bg-dark: #121212;
   --input-bg: #1e1e1e;
-  --text-color: #e0e0e0;
-  --secondary-text: #a1a1aa;
+  --text-color: #f9fafb;
+  --secondary-text: #d1d5db;
   --bot-bg: #1e1e1e;
-  --user-bg: #0a84ff;
-  --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --user-bg: #2563eb;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   --font-family: 'Inter', sans-serif;
-  --bg-pattern-1: rgba(74, 222, 128, 0.1);
-  --bg-pattern-2: rgba(96, 165, 250, 0.1);
+
+  --bg-pattern-1: rgba(74, 222, 128, 0.3);
+  --bg-pattern-2: rgba(96, 165, 250, 0.3);
 }
 
 * {
@@ -31,12 +32,13 @@ body {
     radial-gradient(circle at 20px 20px, var(--bg-pattern-1) 1px, transparent 0),
     radial-gradient(circle at 60px 60px, var(--bg-pattern-2) 1px, transparent 0);
   background-size: 80px 80px;
+  animation: backgroundShift 20s linear infinite;
   height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0.5rem;
-  animation: backgroundShift 20s linear infinite;
+  color: var(--text-color);
 }
 
 @keyframes backgroundShift {
@@ -56,12 +58,12 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #3a3a3c;
+  border: 1px solid #2e2e2e;
 }
 
 .header {
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid #3a3a3c;
+  border-bottom: 1px solid #2e2e2e;
 }
 
 .header-content {
@@ -92,7 +94,6 @@ body {
   color: var(--secondary-text);
 }
 
-/* --- Messages --- */
 .chat-messages {
   flex: 1;
   padding: 1rem;
@@ -167,7 +168,7 @@ body {
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  border-top: 1px solid #3a3a3c;
+  border-top: 1px solid #2e2e2e;
   background: var(--bg-dark);
 }
 
@@ -205,7 +206,7 @@ body {
   background: var(--primary-hover);
 }
 
-/* Markdown support in replies */
+/* Markdown */
 .content :is(h1, h2, h3, strong, em, code, pre, ul, ol, a) {
   color: inherit;
 }
@@ -216,7 +217,6 @@ body {
   font-family: monospace;
 }
 
-/* Retry Button */
 .retry-button {
   font-size: 0.8rem;
   color: var(--primary-color);
@@ -225,7 +225,7 @@ body {
   text-align: right;
 }
 
-/* Mobile tweaks */
+/* Mobile responsive */
 @media (max-width: 768px) {
   html {
     font-size: 15px;
