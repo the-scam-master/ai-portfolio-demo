@@ -69,9 +69,29 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ message })
       });
 
-      const data = await res.json();
-      const reply = data.reply || "Sorry, I couldn't generate a response.";
-      addMessageToUI(reply, 'bot', true);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let result = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = JSON.parse(line.substring(6));
+            result += data.text;
+            addMessageToUI(result, 'bot', true);
+          }
+        }
+      }
     } catch (err) {
       console.error(err);
       addMessageToUI("Sorry, I'm having trouble right now. Please try again later.", 'bot');
