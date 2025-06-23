@@ -76,24 +76,6 @@ body {
   z-index: 100;
 }
 
-#chat-messages {
-  overflow-y: auto;
-  max-height: 100%;
-}
-
-@media (max-width: 768px) {
-  .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  }
-  .chat-container {
-    padding-top: 80px;
-  }
-}
-
 .header-content {
   display: flex;
   align-items: center;
@@ -273,6 +255,25 @@ body {
     max-height: 100dvh;
     border-radius: 0;
   }
+
+@media (max-width: 768px) {
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Keeps it above other content */
+    background: var(--bg-dark); /* Ensures it’s visible; adjust color as needed */
+  }
+  .chat-container {
+    padding-top: 60px; /* Matches your header height; adjust if different */
+  }
+  .chat-messages {
+    height: calc(100vh - 120px); /* Adjust based on header + input area heights */
+    overflow-y: auto; /* Allows scrolling within the chat area */
+  }
+}
+  
 }
 @media (max-width: 480px) {
   html {
