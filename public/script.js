@@ -11,6 +11,22 @@ document.addEventListener('DOMContentLoaded', () => {
     chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
   }
 
+  function adjustChatHeight() {
+    const chatMessages = document.getElementById('chat-messages');
+    const headerHeight = document.querySelector('.header').offsetHeight;
+    const inputAreaHeight = document.querySelector('.input-area').offsetHeight;
+  
+    if (window.innerWidth <= 768) {
+      chatMessages.style.height = `calc(100vh - ${headerHeight + inputAreaHeight}px)`;
+      window.addEventListener('resize', () => {
+        const newHeight = window.visualViewport.height - headerHeight - inputAreaHeight;
+        chatMessages.style.height = `${newHeight}px`;
+      });
+    }
+  }
+
+  window.addEventListener('load', adjustChatHeight);
+  
   function createMessageElement(sender, content = '', isTyping = false) {
     const div = document.createElement('div');
     div.className = `message ${sender}-message`;
