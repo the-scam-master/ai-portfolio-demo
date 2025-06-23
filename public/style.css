@@ -72,6 +72,10 @@ body {
 .header {
   padding: 1rem 1.25rem;
   border-bottom: 1px solid #2e2e2e;
+  position: sticky; /* Keeps header fixed */
+  top: 0;
+  background: var(--bg-dark); /* Ensures background matches */
+  z-index: 100; /* Stays above other content */
 }
 
 .header-content {
