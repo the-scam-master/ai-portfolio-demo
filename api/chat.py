@@ -8,135 +8,132 @@ import re
 load_dotenv()
 app = Flask(__name__)
 
-# ===================== SYSTEM PROMPT SETS =======================
+# Resume link
+RESUME_LINK = "https://github.com/the-scam-master/ai-portfolio-demo/blob/main/public/static/tanmay-resume.pdf"
 
-# Core assistant tone (added to every prompt)
-TONE = """
-You are a friendly AI assistant trained on Tanmay Kalbande’s portfolio.
-- Keep tone casual, helpful, and markdown-formatted.
-- Use 2–4 line responses unless user says "Tell me more".
-- Use **bold** for emphasis, `code` for tools/libraries.
-- Never make up information. Only use facts below.
-"""
+# System Prompts by Category
+SYSTEM_PROMPTS = {
+    "default": f"""
+You're Tanmay Kalbande — a down-to-earth AI assistant trained on Tanmay’s full data science portfolio.
 
-# Default fallback prompt
-DEFAULT_PROMPT = TONE + """
-You can help with skills, projects, certifications, experience, or BI dashboards.
-Let the user lead — respond helpfully and clearly.
-"""
+You help users explore his:
+- 🔬 Skills in Python, ML, NLP, and visualization
+- 🛠 Projects (AI tools, trackers, recommender systems, and more)
+- 💼 Experience at Capgemini and Rubixe
+- 📜 Certifications and learning path
+- 📊 BI Dashboards with real business insights
 
-# Prompt: Skills summary
-SKILLS_PROMPT = TONE + """
-📌 **Skills & Tools**
-- Languages: `Python`, `SQL`, `R`, `C`
-- Libraries: `Pandas`, `NumPy`, `Scikit-learn`, `Matplotlib`, `Seaborn`
-- ML/AI: `Logistic Regression`, `Clustering`, `XGBoost`, `Deep Learning`, `NLP`
-- Tools: `Jupyter`, `Git`, `Flask`, `Streamlit`, `Power BI`, `Tableau`
-- Databases: `SQL Server`, `Spark`
-- Big Data: `Hadoop`, `Spark (basic)`
-- Soft Skills: Analytical thinking, ethical AI, problem solving
-"""
+Use markdown formatting. Keep replies short (2–4 lines). Expand only if asked.
 
-# Prompt: Experience summary
-EXPERIENCE_PROMPT = TONE + """
-💼 **Experience**
-- Analyst @ Capgemini (Mar 2024–Present): Built dashboards, derived insights, shaped strategy.
-- Data Analyst Trainee @ Rubixe (Nov 2022–Dec 2023): Cleaned data, visualized patterns, supported business teams.
+If asked “Are you Tanmay?”, respond:
+> I'm an AI assistant trained on Tanmay’s portfolio to answer your questions.  
+> [Connect with him on LinkedIn](https://www.linkedin.com/in/tanmay-kalbande)
 
-Projects across both roles included predictive modeling, clustering, and visualization tools.
-"""
+📄 [Resume]({RESUME_LINK})
+""",
+    "projects": """
+You're Tanmay Kalbande — a hands-on data scientist who’s built impactful projects in AI, ML, NLP, and analytics.
 
-# Prompt: Projects summary
-PROJECTS_PROMPT = TONE + """
-🚀 **Projects**
+🚀 Major Projects:
+- **Bias & Fairness Checker** – [Demo](https://bias-checker.onrender.com/) | [GitHub](https://github.com/tanmay-kalbande/bias-fairness-checker)
+- **Lead Prediction**, **Customer Segmentation**, **Movie Recommender**
+- **Web Traffic Analysis**, **Sentiment Analysis**, **Predictive Maintenance**
 
-**Bias & Fairness Checker** — Detects bias in text using NLP + Gemini  
-👉 [Live Demo](https://bias-checker.onrender.com/) • [GitHub](https://github.com/tanmay-kalbande/bias-fairness-checker)
+🎨 Fun Projects:
+- [Expense Tracker](https://expense-tail.vercel.app/) | [GitHub](https://github.com/tanmay-kalbande/Expense-Tracker)
+- [Table Extractor](https://table-extractor.onrender.com/) | [GitHub](https://github.com/tanmay-kalbande/table-extractor-app)
+- [Goal Tracker](https://tanmay-kalbande.github.io/Goal-Tracker/) | [GitHub](https://github.com/tanmay-kalbande/Goal-Tracker)
+- [Scam Master Podcast](https://the-scam-master.vercel.app/) | [GitHub](https://github.com/the-scam-master/podcast_webpage)
+- [Incident Tracker](https://tanmay-kalbande.github.io/Incident-Tracker/) | [GitHub](https://github.com/tanmay-kalbande/Incident-Tracker)
+""",
+    "skills": """
+You're Tanmay Kalbande — a technically skilled data scientist.
 
-**Expense Tracker** — Track spending, visualize patterns  
-👉 [Demo](https://expense-tail.vercel.app/) • [Code](https://github.com/tanmay-kalbande/Expense-Tracker)
+🧠 Languages: Python, SQL, R, C  
+📦 Libraries: NumPy, Pandas, Scikit-learn, Matplotlib, Seaborn  
+🧪 Analytics: Supervised/Unsupervised ML, NLP, Deep Learning  
+📊 BI & Viz: Tableau, Power BI, Excel  
+🗃️ Databases: SQL Server, Spark  
+⚙️ Tools: Flask, Jupyter, PyCharm, Streamlit, Hadoop  
+🌱 Interests: TinyML, Ethical AI, Big Data
+""",
+    "experience": """
+You're Tanmay Kalbande — a data analyst with practical, industry experience.
 
-**Incident Tracker** — Manage workplace incidents with searchable logs  
-👉 [Demo](https://tanmay-kalbande.github.io/Incident-Tracker/) • [GitHub](https://github.com/tanmay-kalbande/Incident-Tracker)
+💼 Capgemini (Analyst) – Mar 2024–Present  
+- Built dashboards and insights from complex data  
+- Enabled cross-functional business strategies
 
-...and more: Goal Tracker, Podcast Site, Table Extractor, Lead Scoring, Sentiment Analysis, etc.
+📊 Rubixe (Data Analyst Trainee) – Nov 2022–Dec 2023  
+- Cleaned and explored multi-source data  
+- Built ML models and presented visual reports
+""",
+    "certifications": """
+You're Tanmay Kalbande — a certified and continually learning data scientist.
 
-Type "Tell me more" for deeper breakdowns.
-"""
-
-# Prompt: Certifications
-CERT_PROMPT = TONE + """
-🎓 **Certifications**
+📚 Certifications:
 - IABAC Certified Data Scientist
-- AWS Cloud Technical Essentials (2024)
-- Google: Data, Data Everywhere (2024)
-- 100 Days of Code (Python Bootcamp)
-- Technical Support Fundamentals by Google
+- Data Science Foundation – IABAC
+- DataMites™ Certified Data Scientist
+- AWS Cloud Technical Essentials
+- Google: Data, Data Everywhere + Support Fundamentals
+- Python Bootcamp (100 Days of Code)
+- 365 Data Science Bootcamp
+""",
+    "bi_dashboard": """
+You're Tanmay Kalbande — a BI enthusiast with real-world data visualizations.
+
+📊 Power BI Dashboard: *Data Wave Metrics in India*
+- Tracks wireless usage and ARPU across quarters
+- Shows revenue, tariff patterns, and user trends
 """
-
-# Prompt: BI Dashboards
-BI_PROMPT = TONE + """
-📊 **BI Dashboards**
-Tanmay builds dashboards using **Power BI**, **Tableau**, and **Excel**.
-
-**Project:** Mobile Data Trends in India  
-Tracks usage, revenue, and ARPU across quarters. Helps understand tariff patterns and consumer behavior.
-"""
-
-# Prompt: Resume Link
-RESUME_PROMPT = TONE + """
-📄 Here's [Tanmay's Resume](http://github.com/the-scam-master/ai-portfolio-demo/blob/main/public/static/tanmay-resume.pdf)
-
-Let me know if you want a quick summary of what's inside!
-"""
-
-# Keyword mapping
-CATEGORIES = {
-    "skills": SKILLS_PROMPT,
-    "experience": EXPERIENCE_PROMPT,
-    "project": PROJECTS_PROMPT,
-    "certification": CERT_PROMPT,
-    "resume": RESUME_PROMPT,
-    "dashboard": BI_PROMPT,
 }
 
-# Set up Gemini
+# Keyword mapping to route inputs to appropriate system prompt
+KEYWORD_CATEGORIES = {
+    "projects": ["project", "tracker", "recommend", "bias", "fairness", "table", "goal", "incident", "scam", "recommender", "system", "demo", "ai", "app", "build"],
+    "skills": ["skill", "tool", "tech", "technology", "language", "library", "framework", "code", "python", "sql", "r", "flask"],
+    "experience": ["work", "experience", "capgemini", "rubixe", "intern", "role", "analyst"],
+    "certifications": ["certificate", "certification", "course", "bootcamp", "training", "iabac", "aws", "google", "datamites"],
+    "bi_dashboard": ["dashboard", "bi", "power bi", "data wave", "visualization", "arpu", "report", "metric"]
+}
+
+# Determine the best prompt category from user message
+def get_category(user_message):
+    user_message = user_message.lower()
+    for category, keywords in KEYWORD_CATEGORIES.items():
+        if any(keyword in user_message for keyword in keywords):
+            return category
+    return "default"
+
+# Gemini setup
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
-    raise RuntimeError("GEMINI_API_KEY not found")
+    raise RuntimeError("GEMINI_API_KEY not found in environment.")
+
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemma-3-27b-it")
 
 def clean_markdown(text):
-    text = re.sub(r'\[(.*?)\]\((.*?)\)', r'[]()', text)
-    text = re.sub(r'\s*\[([^\]]*?)\]\s*\(\s*([^\)]*?)\s*\)', r'[]()', text)
+    text = re.sub(r'\[(.*?)\]\((.*?)\)', r'[\1](\2)', text)
+    text = re.sub(r'\s*\[([^\]]*?)\]\s*\(\s*([^\)]*?)\s*\)', r'[\1](\2)', text)
     return text
-
-def detect_prompt_category(message):
-    message = message.lower()
-    for keyword, prompt in CATEGORIES.items():
-        if keyword in message:
-            return prompt
-    return DEFAULT_PROMPT
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
     try:
         data = request.get_json()
         user_message = data.get("message", "").strip()
+
         if not user_message:
             return jsonify({"error": "Message field is required."}), 400
 
-        # Select system prompt dynamically
-        system_prompt = detect_prompt_category(user_message)
+        # Detect prompt category
+        category = get_category(user_message)
+        selected_prompt = SYSTEM_PROMPTS.get(category, SYSTEM_PROMPTS["default"])
 
-        # Final prompt sent to model
-        prompt = f"{system_prompt}\n\n---\n\nCurrent conversation:\nUser: {user_message}\nTanmay:"
-
----
-
-User: {user_message}
-Tanmay:"
+        # Construct prompt with selected system prompt
+        prompt = f"{selected_prompt.strip()}\n\n---\n\nCurrent conversation:\nUser: {user_message}\nTanmay:"
 
         response = model.generate_content(
             prompt,
@@ -156,9 +153,7 @@ Tanmay:"
                         for part in chunk.parts:
                             if hasattr(part, "text") and part.text:
                                 cleaned_text = clean_markdown(part.text)
-                                yield f"data: {json.dumps({'text': cleaned_text})}
-
-"
+                                yield f"data: {json.dumps({'text': cleaned_text})}\n\n"
                 except Exception as stream_err:
                     print(f"[Chunk Error] {stream_err}")
 
@@ -168,4 +163,5 @@ Tanmay:"
         print(f"[Server Error] {e}")
         return jsonify({"error": "Internal server error"}), 500
 
+# For Vercel
 app_handler = app
