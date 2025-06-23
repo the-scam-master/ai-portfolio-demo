@@ -15,25 +15,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatMessages = document.getElementById('chat-messages');
     const headerHeight = document.querySelector('.header').offsetHeight;
     const inputAreaHeight = document.querySelector('.input-area').offsetHeight;
-  
+    const totalHeight = headerHeight + inputAreaHeight;
+
     if (window.innerWidth <= 768) {
-      chatMessages.style.height = `calc(100vh - ${headerHeight + inputAreaHeight}px)`;
-      window.addEventListener('resize', () => {
-        const newHeight = window.visualViewport.height - headerHeight - inputAreaHeight;
-        chatMessages.style.height = `${newHeight}px`;
-      });
+      const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      chatMessages.style.height = `${viewportHeight - totalHeight}px`;
     }
   }
 
+  // Run on page load and when the window resizes (e.g., keyboard opens)
   window.addEventListener('load', adjustChatHeight);
-  
+  window.addEventListener('resize', adjustChatHeight);
+
   function createMessageElement(sender, content = '', isTyping = false) {
     const div = document.createElement('div');
     div.className = `message ${sender}-message`;
-
     const avatar = sender === 'user' ? 'Y' : 'T';
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
     const messageText = isTyping
       ? '<em>Typing...</em>'
       : marked.parseInline(content);
@@ -63,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!message) return;
 
     stopPreviousStream();
-
     createMessageElement('user', message);
     const botBubble = createMessageElement('bot', '', true);
 
@@ -78,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message,
-          history: conversationHistory.slice(-40) // Limit context to last 5 user+bot messages
+          history: conversationHistory.slice(-40) // Limit context to last 40 messages
         }),
       });
 
@@ -96,10 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (value) {
           const textChunk = decoder.decode(value, { stream: true });
           const matches = textChunk.match(/data:\s*(.*?)\n/g);
+
           if (matches) {
             for (const line of matches) {
               const dataStr = line.replace(/^data:\s*/, '').trim();
               if (dataStr === '[DONE]') break;
+
               try {
                 const parsed = JSON.parse(dataStr);
                 if (parsed.text) {
