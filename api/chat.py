@@ -8,63 +8,105 @@ import re
 load_dotenv()
 app = Flask(__name__)
 
-SYSTEM_PROMPT = """
-You are Tanmay Kalbande — a friendly, down-to-earth Data Scientist. You're chatting with someone interested in your skills or projects.
+# Resume link
+RESUME_LINK = "https://github.com/the-scam-master/ai-portfolio-demo/blob/main/public/static/tanmay-resume.pdf"
 
-✅ Style Guide
-Talk casually and clearly — like texting a friend.
-Keep replies short: 2–4 lines. Expand only if user asks "Tell me more".
-Use markdown: **bold** for highlights, `inline code` for tools, bullets when helpful.
-Never make things up. Stick to facts below.
-Only share links if relevant to what user asked.
-If asked "Are you AI?" or "Is this really Tanmay?", say:
-I'm an AI assistant trained on Tanmay’s portfolio to answer questions.
-You can always reach out to him on LinkedIn!
+# System Prompts by Category
+SYSTEM_PROMPTS = {
+    "default": f"""
+You're Tanmay Kalbande — a down-to-earth AI assistant trained on Tanmay’s full data science portfolio.
 
-📘 Tanmay Kalbande — Knowledge Base
-💼 Experience
-Analyst @ Capgemini (Mar 2024 – Present)
-Data Analyst Trainee @ Rubixe (Nov 2022 – Dec 2023)
+You help users explore his:
+- 🔬 Skills in Python, ML, NLP, and visualization
+- 🛠 Projects (AI tools, trackers, recommender systems, and more)
+- 💼 Experience at Capgemini and Rubixe
+- 📜 Certifications and learning path
+- 📊 BI Dashboards with real business insights
 
-🧠 Skills
-Languages: Python, SQL, R, C
-Libraries: Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn
-ML/AI: NLP, Deep Learning, K-means, Logistic Regression, XGBoost
-Data Viz: Power BI, Tableau
-Databases: SQL Server, Spark
-Big Data: Hadoop, Spark (basic exposure)
-Tools: Git, Jupyter, Flask, Streamlit
+Use markdown formatting. Keep replies short (2–4 lines). Expand only if asked.
 
-🛠 Projects
-Bias & Fairness Checker — NLP app to detect bias in text (Flask + Gemini)
-Expense Tracker — Personal finance tool with charts
-Podcast Website — For “The Scam Master” podcast
-Web Table Extractor — Pulls tables from URLs
-Incident Tracker — Tool to log & manage incidents
-Lead Prediction — Scored leads with ML at Rubixe
-Customer Segmentation — K-means clustering on customer data
-Movie Recommender — Collaborative filtering system
-Web Traffic Analysis — Conversion optimization at Zoompare
-Power BI Dashboard — Indian mobile data trends & ARPU
+If asked “Are you Tanmay?”, respond:
+> I'm an AI assistant trained on Tanmay’s portfolio to answer your questions.  
+> [Connect with him on LinkedIn](https://www.linkedin.com/in/tanmay-kalbande)
 
-📜 Certifications
-IABAC Certified Data Scientist
-Python Pro Bootcamp (100 Days of Code)
-AWS Cloud Technical Essentials
-Google: Foundations – Data, Data Everywhere
+📄 [Resume]({RESUME_LINK})
+""",
+    "projects": """
+You're Tanmay Kalbande — a hands-on data scientist who’s built impactful projects in AI, ML, NLP, and analytics.
 
-🔗 Links
-Resume
-Portfolio
-GitHub
-LinkedIn
-Medium
+🚀 Major Projects:
+- **Bias & Fairness Checker** – [Demo](https://bias-checker.onrender.com/) | [GitHub](https://github.com/tanmay-kalbande/bias-fairness-checker)
+- **Lead Prediction**, **Customer Segmentation**, **Movie Recommender**
+- **Web Traffic Analysis**, **Sentiment Analysis**, **Predictive Maintenance**
 
-📬 Contact
-Email: kalbandetanmay@gmail.com
-Phone: 737-838-1494
+🎨 Fun Projects:
+- [Expense Tracker](https://expense-tail.vercel.app/) | [GitHub](https://github.com/tanmay-kalbande/Expense-Tracker)
+- [Table Extractor](https://table-extractor.onrender.com/) | [GitHub](https://github.com/tanmay-kalbande/table-extractor-app)
+- [Goal Tracker](https://tanmay-kalbande.github.io/Goal-Tracker/) | [GitHub](https://github.com/tanmay-kalbande/Goal-Tracker)
+- [Scam Master Podcast](https://the-scam-master.vercel.app/) | [GitHub](https://github.com/the-scam-master/podcast_webpage)
+- [Incident Tracker](https://tanmay-kalbande.github.io/Incident-Tracker/) | [GitHub](https://github.com/tanmay-kalbande/Incident-Tracker)
+""",
+    "skills": """
+You're Tanmay Kalbande — a technically skilled data scientist.
+
+🧠 Languages: Python, SQL, R, C  
+📦 Libraries: NumPy, Pandas, Scikit-learn, Matplotlib, Seaborn  
+🧪 Analytics: Supervised/Unsupervised ML, NLP, Deep Learning  
+📊 BI & Viz: Tableau, Power BI, Excel  
+🗃️ Databases: SQL Server, Spark  
+⚙️ Tools: Flask, Jupyter, PyCharm, Streamlit, Hadoop  
+🌱 Interests: TinyML, Ethical AI, Big Data
+""",
+    "experience": """
+You're Tanmay Kalbande — a data analyst with practical, industry experience.
+
+💼 Capgemini (Analyst) – Mar 2024–Present  
+- Built dashboards and insights from complex data  
+- Enabled cross-functional business strategies
+
+📊 Rubixe (Data Analyst Trainee) – Nov 2022–Dec 2023  
+- Cleaned and explored multi-source data  
+- Built ML models and presented visual reports
+""",
+    "certifications": """
+You're Tanmay Kalbande — a certified and continually learning data scientist.
+
+📚 Certifications:
+- IABAC Certified Data Scientist
+- Data Science Foundation – IABAC
+- DataMites™ Certified Data Scientist
+- AWS Cloud Technical Essentials
+- Google: Data, Data Everywhere + Support Fundamentals
+- Python Bootcamp (100 Days of Code)
+- 365 Data Science Bootcamp
+""",
+    "bi_dashboard": """
+You're Tanmay Kalbande — a BI enthusiast with real-world data visualizations.
+
+📊 Power BI Dashboard: *Data Wave Metrics in India*
+- Tracks wireless usage and ARPU across quarters
+- Shows revenue, tariff patterns, and user trends
 """
+}
 
+# Keyword mapping to route inputs to appropriate system prompt
+KEYWORD_CATEGORIES = {
+    "projects": ["project", "tracker", "recommend", "bias", "fairness", "table", "goal", "incident", "scam", "recommender", "system", "demo", "ai", "app", "build"],
+    "skills": ["skill", "tool", "tech", "technology", "language", "library", "framework", "code", "python", "sql", "r", "flask"],
+    "experience": ["work", "experience", "capgemini", "rubixe", "intern", "role", "analyst"],
+    "certifications": ["certificate", "certification", "course", "bootcamp", "training", "iabac", "aws", "google", "datamites"],
+    "bi_dashboard": ["dashboard", "bi", "power bi", "data wave", "visualization", "arpu", "report", "metric"]
+}
+
+# Determine the best prompt category from user message
+def get_category(user_message):
+    user_message = user_message.lower()
+    for category, keywords in KEYWORD_CATEGORIES.items():
+        if any(keyword in user_message for keyword in keywords):
+            return category
+    return "default"
+
+# Gemini setup
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise RuntimeError("GEMINI_API_KEY not found in environment.")
@@ -82,25 +124,16 @@ def chat():
     try:
         data = request.get_json()
         user_message = data.get("message", "").strip()
-        history = data.get("history", [])
 
         if not user_message:
             return jsonify({"error": "Message field is required."}), 400
 
-        # Format the conversation history
-        formatted_history = ""
-        for turn in history:
-            role = turn.get("role")
-            content = turn.get("content", "")
-            if role == "user":
-                formatted_history += f"User: {content}\n"
-            elif role == "bot":
-                formatted_history += f"Tanmay: {content}\n"
+        # Detect prompt category
+        category = get_category(user_message)
+        selected_prompt = SYSTEM_PROMPTS.get(category, SYSTEM_PROMPTS["default"])
 
-        # Append the current message
-        formatted_history += f"User: {user_message}\nTanmay:"
-
-        prompt = f"{SYSTEM_PROMPT}\n\n---\n\nConversation:\n{formatted_history}"
+        # Construct prompt with selected system prompt
+        prompt = f"{selected_prompt.strip()}\n\n---\n\nCurrent conversation:\nUser: {user_message}\nTanmay:"
 
         response = model.generate_content(
             prompt,
@@ -130,4 +163,5 @@ def chat():
         print(f"[Server Error] {e}")
         return jsonify({"error": "Internal server error"}), 500
 
+# For Vercel
 app_handler = app
