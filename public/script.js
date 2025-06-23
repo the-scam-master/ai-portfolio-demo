@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const sendBtn = document.getElementById('send-btn');
   let source = null;
 
+  // Store recent messages for context
+  const conversationHistory = [];
+
   function scrollToBottom() {
     chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
   }
@@ -48,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
     createMessageElement('user', message);
     const botBubble = createMessageElement('bot', '', true);
 
+    // Add user message to history
+    conversationHistory.push({ role: 'user', content: message });
     userInput.value = '';
     userInput.focus();
 
@@ -55,7 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({
+          message,
+          history: conversationHistory.slice(-40) // Limit context to last 5 user+bot messages
+        }),
       });
 
       if (!res.ok || !res.body) throw new Error('Failed to connect.');
@@ -63,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const reader = res.body.getReader();
       const decoder = new TextDecoder('utf-8');
       let done = false;
-
       let fullText = '';
 
       while (!done) {
@@ -92,6 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      // Add bot reply to history
+      conversationHistory.push({ role: 'bot', content: fullText });
+
     } catch (err) {
       console.error(err);
       botBubble.innerHTML = marked.parseInline('**[Error receiving response]**');
@@ -103,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') sendMessage();
   });
 
-  // ✅ Initial Welcome Message (with markdown)
+  // Initial message
   createMessageElement(
     'bot',
     "Hi! I'm an AI assistant representing **Tanmay Kalbande**.\n\nAsk me about his [projects](#), skills, or experience!"
