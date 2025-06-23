@@ -131,7 +131,7 @@ def chat():
         system_prompt = detect_prompt_category(user_message)
 
         # Final prompt sent to model
-        prompt = f"{system_prompt}
+        prompt = f"{system_prompt}\n\n---\n\nCurrent conversation:\nUser: {user_message}\nTanmay:"
 
 ---
 
