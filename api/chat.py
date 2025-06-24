@@ -116,7 +116,7 @@ I'm a data science enthusiast skilled in statistical analysis, machine learning,
 - WhatsApp: [737-838-1494](https://wa.me/7378381494?text=Hi%20Tanmay,%20I%20came%20across%20your%20portfolio%20and%20I%20)
 - LinkedIn: [Tanmay Kalbande](https://www.linkedin.com/in/tanmay-kalbande)
 - GitHub: [tanmay-kalbande](https://github.com/tanmay-kalbande)
-- Resume: [Tanmay's Resume](https://github.com/the-scam-master/ai-portfolio-demo/blob/main/public/static/tanmay-resume.pdf)
+- Resume: [Tanmay's Resume](https://tanmay-kalbande.github.io/)
 
 ---
 
