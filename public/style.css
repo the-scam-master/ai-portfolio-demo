@@ -175,6 +175,27 @@ body {
   margin-top: 0.25rem;
 }
 
+.suggestions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  flex-wrap: wrap;
+  background: var(--bg-dark);
+}
+
+.suggestion {
+  background: var(--input-bg);
+  color: var(--secondary-text);
+  padding: 0.3rem 0.8rem;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background: var(--primary-hover);
+}
+
 .input-area {
   display: flex;
   align-items: center;
@@ -248,29 +269,32 @@ body {
   overflow-wrap: break-word;
 }
 
-.retry-button {
-  font-size: 0.8rem;
-  color: var(--primary-color);
-  margin-top: 0.25rem;
+.retry-btn {
+  background: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
   cursor: pointer;
-  text-align: right;
+  margin-top: 0.3rem;
 }
 
 /* Mobile-specific styles */
 @media (max-width: 768px) {
   html {
-    font-size: 16px; /* Increased base font size for readability */
+    font-size: 16px;
   }
   .chat-container {
     height: 100dvh;
     max-height: 100dvh;
-    border-radius: 0; /* Full-screen, no border radius */
-    border: none; /* Removed border for cleaner look */
+    border-radius: 0;
+    border: none;
     margin: 0;
   }
   .header {
-    padding: 0.75rem; /* Compact padding */
-    border-bottom: none; /* Removed border for minimalism */
+    padding: 0.75rem;
+    border-bottom: none;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -281,24 +305,24 @@ body {
   .avatar-header {
     width: 40px;
     height: 40px;
-    font-size: 1.3rem; /* Slightly larger for clarity */
+    font-size: 1.3rem;
   }
   .header-text h1 {
-    font-size: 1.2rem; /* Larger title */
+    font-size: 1.2rem;
   }
   .header-text p {
-    font-size: 0.9rem; /* Larger subtitle */
+    font-size: 0.9rem;
   }
   .chat-messages {
-    padding: 1rem 0.5rem; /* Increased top padding for header gap */
-    gap: 0.75rem; /* Slightly larger gap between messages */
+    padding: 1rem 0.5rem;
+    gap: 0.75rem;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
   }
   .message {
     max-width: 90%;
-    gap: 0.6rem; /* Adjusted gap to prevent avatar crowding */
-    align-items: flex-start; /* Align avatars and content at top */
+    gap: 0.6rem;
+    align-items: flex-start;
   }
   .avatar {
     width: 32px;
@@ -308,7 +332,7 @@ body {
   .content {
     padding: 0.6rem 0.8rem;
     border-radius: 12px;
-    font-size: 1rem; /* Larger text for readability */
+    font-size: 1rem;
     line-height: 1.5;
   }
   .content ul, .content ol {
@@ -318,18 +342,26 @@ body {
   .content li {
     margin-bottom: 0.3rem;
   }
+  .suggestions {
+    padding: 0.3rem 0.5rem;
+    gap: 0.4rem;
+  }
+  .suggestion {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+  }
   .input-area {
     padding: 0.5rem;
     gap: 0.5rem;
-    border-top: none; /* Removed border for cleaner look */
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+    border-top: none;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.15);
   }
   .input-area input {
     padding: 0.6rem 0.8rem;
     border-radius: 20px;
-    font-size: 1rem; /* Larger input text */
-    border: none; /* Removed border for minimalism */
-    background: #2a2a2a; /* Slightly lighter for contrast */
+    font-size: 1rem;
+    border: none;
+    background: #2a2a2a;
   }
   .input-area input:focus {
     box-shadow: 0 0 0 2px var(--primary-color);
@@ -337,16 +369,20 @@ body {
   .input-area button {
     width: 40px;
     height: 40px;
-    border: none; /* No border on button */
+    border: none;
   }
   .timestamp {
-    font-size: 0.8rem; /* Slightly larger timestamp */
+    font-size: 0.8rem;
+  }
+  .retry-btn {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
   }
 }
 
 @media (max-width: 480px) {
   html {
-    font-size: 15px; /* Adjusted for smaller screens */
+    font-size: 15px;
   }
   .chat-container {
     height: 100dvh;
@@ -381,6 +417,14 @@ body {
     font-size: 0.95rem;
     border-radius: 10px;
   }
+  .suggestions {
+    padding: 0.2rem 0.4rem;
+    gap: 0.3rem;
+  }
+  .suggestion {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
   .input-area input {
     padding: 0.5rem 0.7rem;
     font-size: 0.95rem;
@@ -392,5 +436,9 @@ body {
   }
   .timestamp {
     font-size: 0.75rem;
+  }
+  .retry-btn {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
   }
 }
