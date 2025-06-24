@@ -33,26 +33,23 @@ body {
     radial-gradient(circle at 60px 60px, var(--bg-pattern-2) 1px, transparent 0);
   background-size: 80px 80px;
   animation: backgroundShift 20s linear infinite;
-  height: 100svh; /* ✅ safer on mobile */
+  height: 100svh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.25rem;
   color: var(--text-color);
 }
 
 @keyframes backgroundShift {
   0% { background-position: 0 0; }
-  50% { background-position: 40px 40px; }
+  50% { background-position: 40px; }
   100% { background-position: 80px 80px; }
 }
 
 .content a {
-  color: #4ea1ff;
+  color: #4ea6ff;
   text-decoration: underline;
-}
-.content a:hover {
-  color: #88c7ff;
 }
 
 .chat-container {
@@ -159,6 +156,7 @@ body {
   line-height: 1.5;
   font-size: 0.95rem;
   word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .user-message .content {
@@ -181,7 +179,7 @@ body {
   padding: 0.75rem 1rem;
   border-top: 1px solid #2e2e2e;
   background: var(--bg-dark);
-  position: sticky; /* ✅ sticks above keyboard */
+  position: sticky;
   bottom: 0;
   z-index: 10;
 }
@@ -236,6 +234,16 @@ body {
   border-radius: 6px;
   overflow-x: auto;
 }
+.content ul, .content ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+  list-style-position: outside;
+}
+.content li {
+  margin-bottom: 0.25rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
 
 .retry-button {
   font-size: 0.8rem;
@@ -255,8 +263,6 @@ body {
     max-height: 100dvh;
     border-radius: 0;
   }
-}
-  
 }
 @media (max-width: 480px) {
   html {
