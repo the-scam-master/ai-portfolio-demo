@@ -1,12 +1,21 @@
 import os
 import json
 from flask import Flask, request, jsonify, Response
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import google.generativeai as genai
 from dotenv import load_dotenv
 import re
 
 load_dotenv()
 app = Flask(__name__)
+
+# Initialize Flask-Limiter
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["100 per day", "10 per minute"]
+)
 
 SYSTEM_PROMPT = """
 You are Tanmay Kalbande — a friendly, down-to-earth Data Scientist. You're chatting with someone interested in your skills or projects.
@@ -103,7 +112,9 @@ I'm a data science enthusiast skilled in statistical analysis, machine learning,
 
 **Certifications**
 - AWS Cloud Technical Essentials (Dec 2024)
-- Google: Foundations – Data, Data, Everywhere (Apr 2024)
+- Google: Foundations – Data, Data, Everywhere (Apr 
+
+2024)
 - Google: Technical Support Fundamentals (Dec 2023)
 - IABAC Certified Data Scientist (Sep 2023)
 - IABAC Data Science Foundation (Aug 2023)
@@ -165,14 +176,18 @@ def clean_markdown(text):
     return text
 
 @app.route("/api/chat", methods=["POST"])
+@limiter.limit("20 per minute")  # Rate limit: 20 requests per minute per IP
 def chat():
     try:
         data = request.get_json()
         user_message = data.get("message", "").strip()
         history = data.get("history", [])
 
+        # Validate message length
         if not user_message:
             return jsonify({"error": "Message field is required."}), 400
+        if len(user_message) > 300:
+            return jsonify({"error": "Message too long. Max 300 characters."}), 400
 
         # Format the conversation history
         formatted_history = ""
@@ -209,12 +224,12 @@ def chat():
                                 cleaned_text = clean_markdown(part.text)
                                 yield f"data: {json.dumps({'text': cleaned_text})}\n\n"
                 except Exception as stream_err:
-                    print(f"[Chunk Error] {stream_err}")
+                    logging.error(f"[Chunk Error] {stream_err}")
 
         return Response(generate(), mimetype='text/event-stream')
 
     except Exception as e:
-        print(f"[Server Error] {e}")
+        logging.error(f"[Server Error] {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 app_handler = app
