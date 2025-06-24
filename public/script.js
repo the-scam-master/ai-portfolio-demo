@@ -131,6 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial message
   createMessageElement(
     'bot',
-    "Hi! I'm an AI assistant representing **Tanmay Kalbande**.\n\nAsk me about his [projects](#), skills, or experience!"
+    "Hi! I'm an AI assistant representing **Tanmay Kalbande**.\n\nAsk me about his [projects](https://github.com/tanmaykalbande), skills, or experience!"
   );
 });
