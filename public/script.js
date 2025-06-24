@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const chatMessages = document.getElementById('chat-messages');
   const userInput = document.getElementById('user-input');
   const sendBtn = document.getElementById('send-btn');
+  const suggestions = document.querySelector('.suggestions');
   let source = null;
 
   // Store recent messages for context
@@ -15,7 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatMessages = document.getElementById('chat-messages');
     const headerHeight = document.querySelector('.header').offsetHeight;
     const inputAreaHeight = document.querySelector('.input-area').offsetHeight;
-    const totalHeight = headerHeight + inputAreaHeight;
+    const suggestionsHeight = suggestions ? suggestions.offsetHeight : 0;
+    const totalHeight = headerHeight + inputAreaHeight + suggestionsHeight;
 
     if (window.innerWidth <= 768) {
       const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
@@ -119,9 +121,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (err) {
       console.error(err);
-      botBubble.innerHTML = marked.parse('**[Error receiving response]**');
+      botBubble.innerHTML = marked.parse('**Oops, something went wrong!** Try again or ask me later.');
+      const retryBtn = document.createElement('button');
+      retryBtn.className = 'retry-btn';
+      retryBtn.textContent = 'Retry';
+      retryBtn.addEventListener('click', sendMessage);
+      botBubble.parentElement.appendChild(retryBtn);
     }
   }
+
+  // Handle suggested questions
+  document.querySelectorAll('.suggestion').forEach(span => {
+    span.addEventListener('click', () => {
+      userInput.value = span.dataset.query;
+      suggestions.style.display = 'none'; // Hide suggestions after click
+      sendMessage();
+      adjustChatHeight(); // Recalculate chat height
+    });
+  });
 
   sendBtn.addEventListener('click', sendMessage);
   userInput.addEventListener('keypress', (e) => {
@@ -131,6 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial message
   createMessageElement(
     'bot',
-    "Hi! I'm an AI assistant representing **Tanmay Kalbande**.\n\nAsk me about his [projects](https://github.com/tanmaykalbande), skills, or experience!"
+    "Hi! I'm an AI assistant representing **Tanmay Kalbande**.\n\nAsk me about his [projects](https://github.com/tanmay-kalbande?tab=repositories), skills, experience, or hobbies!"
   );
 });
