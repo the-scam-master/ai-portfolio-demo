@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const messageText = isTyping
       ? '<em>Typing...</em>'
-      : marked.parseInline(content);
+      : marked.parse(content);
 
     div.innerHTML = `
       <div class="avatar">${avatar}</div>
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parsed = JSON.parse(dataStr);
                 if (parsed.text) {
                   fullText += parsed.text;
-                  botBubble.innerHTML = marked.parseInline(fullText);
+                  botBubble.innerHTML = marked.parse(fullText);
                   scrollToBottom();
                 }
               } catch (err) {
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (err) {
       console.error(err);
-      botBubble.innerHTML = marked.parseInline('**[Error receiving response]**');
+      botBubble.innerHTML = marked.parse('**[Error receiving response]**');
     }
   }
 
