@@ -27,15 +27,22 @@
 
     <div id="chat-messages" class="chat-messages"></div>
 
+    <div class="suggestions">
+      <span class="suggestion" data-query="What are Tanmay’s projects?">Projects</span>
+      <span class="suggestion" data-query="What skills does Tanmay have?">Skills</span>
+      <span class="suggestion" data-query="How can I contact Tanmay?">Contact</span>
+      <span class="suggestion" data-query="What does Tanmay like to do for fun?">Hobbies</span>
+    </div>
+
     <div class="input-area">
-        <input
-          type="text"
-          id="user-input"
-          placeholder="Ask about my projects, skills, or experience..."
-          autocomplete="off"
-          autocorrect="off"
-          maxlength="300"
-        />
+      <input
+        type="text"
+        id="user-input"
+        placeholder="Ask about my projects, skills, or experience..."
+        autocomplete="off"
+        autocorrect="off"
+        maxlength="300"
+      />
       <button id="send-btn" aria-label="Send Message">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
              xmlns="http://www.w3.org/2000/svg">
