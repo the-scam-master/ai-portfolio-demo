@@ -259,123 +259,138 @@ body {
 /* Mobile-specific styles */
 @media (max-width: 768px) {
   html {
-    font-size: 15px; /* Slightly smaller font for better fit */
+    font-size: 16px; /* Increased base font size for readability */
   }
   .chat-container {
     height: 100dvh;
     max-height: 100dvh;
-    border-radius: 0; /* Full-screen on mobile */
-    margin: 0; /* Remove outer padding */
+    border-radius: 0; /* Full-screen, no border radius */
+    border: none; /* Removed border for cleaner look */
+    margin: 0;
   }
   .header {
-    padding: 0.75rem; /* Tighter padding for compact look */
+    padding: 0.75rem; /* Compact padding */
+    border-bottom: none; /* Removed border for minimalism */
     position: sticky;
     top: 0;
     z-index: 100;
   }
   .header-content {
-    gap: 0.5rem; /* Smaller gap for mobile */
+    gap: 0.5rem;
   }
   .avatar-header {
-    width: 40px; /* Smaller avatar for mobile */
+    width: 40px;
     height: 40px;
-    font-size: 1.2rem;
+    font-size: 1.3rem; /* Slightly larger for clarity */
   }
   .header-text h1 {
-    font-size: 1.1rem; /* Adjusted for mobile */
+    font-size: 1.2rem; /* Larger title */
   }
   .header-text p {
-    font-size: 0.85rem;
+    font-size: 0.9rem; /* Larger subtitle */
   }
   .chat-messages {
-    padding: 0.5rem; /* Reduced padding for more space */
-    gap: 0.5rem; /* Tighter message spacing */
-    scroll-snap-type: y mandatory; /* Smoother scrolling */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    padding: 1rem 0.5rem; /* Increased top padding for header gap */
+    gap: 0.75rem; /* Slightly larger gap between messages */
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
   }
   .message {
-    max-width: 90%; /* Allow more width for messages */
-    gap: 0.5rem; /* Smaller gap between avatar and content */
+    max-width: 90%;
+    gap: 0.6rem; /* Adjusted gap to prevent avatar crowding */
+    align-items: flex-start; /* Align avatars and content at top */
   }
   .avatar {
-    width: 32px; /* Smaller avatar for mobile */
+    width: 32px;
     height: 32px;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
   .content {
-    padding: 0.5rem 0.75rem; /* Compact content box */
-    border-radius: 12px; /* Softer corners for mobile */
-    font-size: 0.9rem; /* Slightly smaller text */
-    line-height: 1.4; /* Tighter line spacing */
+    padding: 0.6rem 0.8rem;
+    border-radius: 12px;
+    font-size: 1rem; /* Larger text for readability */
+    line-height: 1.5;
   }
   .content ul, .content ol {
-    padding-left: 1.2rem; /* Adjusted for mobile */
-    margin: 0.3rem 0;
+    padding-left: 1.3rem;
+    margin: 0.4rem 0;
   }
   .content li {
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.3rem;
   }
   .input-area {
-    padding: 0.5rem; /* Reduced padding */
+    padding: 0.5rem;
     gap: 0.5rem;
-    background: var(--bg-dark);
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    border-top: none; /* Removed border for cleaner look */
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.15); /* Subtle shadow */
   }
   .input-area input {
-    padding: 0.5rem 0.75rem; /* Compact input */
-    border-radius: 20px; /* Softer input corners */
-    font-size: 0.9rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 20px;
+    font-size: 1rem; /* Larger input text */
+    border: none; /* Removed border for minimalism */
+    background: #2a2a2a; /* Slightly lighter for contrast */
+  }
+  .input-area input:focus {
+    box-shadow: 0 0 0 2px var(--primary-color);
   }
   .input-area button {
-    width: 40px; /* Smaller button */
+    width: 40px;
     height: 40px;
+    border: none; /* No border on button */
   }
   .timestamp {
-    font-size: 0.7rem; /* Smaller timestamp */
+    font-size: 0.8rem; /* Slightly larger timestamp */
   }
 }
 
 @media (max-width: 480px) {
   html {
-    font-size: 14px; /* Further reduce font size */
+    font-size: 15px; /* Adjusted for smaller screens */
   }
   .chat-container {
     height: 100dvh;
     max-height: 100dvh;
-    border-radius: 0;
+    border: none;
   }
   .header {
-    padding: 0.5rem; /* Even tighter padding */
+    padding: 0.6rem;
+    border-bottom: none;
   }
   .avatar-header {
     width: 36px;
     height: 36px;
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
   .header-text h1 {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
   .header-text p {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
   .chat-messages {
-    padding: 0.4rem;
-    gap: 0.4rem;
+    padding: 0.8rem 0.4rem;
+    gap: 0.6rem;
   }
   .message {
-    max-width: 95%; /* Maximize message width */
+    max-width: 95%;
+    gap: 0.5rem;
   }
   .content {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.95rem;
     border-radius: 10px;
   }
   .input-area input {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.95rem;
+    border: none;
   }
   .input-area button {
     width: 36px;
     height: 36px;
+  }
+  .timestamp {
+    font-size: 0.75rem;
   }
 }
