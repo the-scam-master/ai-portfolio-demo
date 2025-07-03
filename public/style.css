@@ -490,3 +490,16 @@ body {
     padding: 0.2rem 0.5rem;
   }
 }
+
+
+// Add mobile preview styles to public/style.css
+document.write(`
+<style>
+  .mobile-preview .chat-container {
+    width: 375px !important;
+    height: 667px !important;
+    margin: 20px auto;
+    box-shadow: 0 0 0 2px red;
+  }
+</style>
+`);
