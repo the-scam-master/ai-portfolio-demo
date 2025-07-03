@@ -157,13 +157,13 @@ function runPortfolioDemo() {
   const demoSteps = [
     { 
       text: "What projects show your AI skills?", 
-      typingSpeed: 50,    // Milliseconds per character (lower = faster)
+      typingSpeed: 65,    // Milliseconds per character (lower = faster)
       waitBefore: 1000,   // Milliseconds to wait BEFORE typing starts
-      waitAfter: 10000     // Milliseconds to wait AFTER sending
+      waitAfter: 13000     // Milliseconds to wait AFTER sending
     },
     { 
       text: "Favorite anime?", 
-      typingSpeed: 50,
+      typingSpeed: 65,
       waitBefore: 4000,
       waitAfter: 8000
     },
