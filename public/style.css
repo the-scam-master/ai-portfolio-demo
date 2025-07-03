@@ -490,30 +490,3 @@ body {
     padding: 0.2rem 0.5rem;
   }
 }
-
-
-const mobileStyle = document.createElement('style');
-mobileStyle.textContent = `
-  .mobile-preview .chat-container {
-    width: 375px !important;
-    height: 667px !important;
-    max-width: 100%;
-    margin: 20px auto;
-    border: 3px solid #ff6b6b;
-    box-shadow: 0 0 15px rgba(255,107,107,0.5);
-    transform: scale(0.85);
-    transition: all 0.5s ease;
-  }
-  
-  .mobile-preview body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #1a1a1a;
-  }
-  
-  .mobile-preview .suggestions {
-    display: none;
-  }
-`;
-document.head.appendChild(mobileStyle);
