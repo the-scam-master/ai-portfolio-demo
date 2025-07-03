@@ -151,12 +151,28 @@ document.addEventListener('DOMContentLoaded', () => {
     "Hi! I'm an AI assistant representing **Tanmay Kalbande**.\n\nAsk me about his [projects](https://github.com/tanmay-kalbande?tab=repositories), skills, experience, or hobbies!"
   );
 
+// Add this to the bottom of your public/script.js file
 function runPortfolioDemo() {
   const demoSteps = [
-    { text: "What projects show your AI skills?", delay: 1000 },
-    { text: "Favorite anime?", delay: 3000 },
-    { text: "Show me Python skills", delay: 3000 },
-    { action: "mobile-test", delay: 4000 }
+    { 
+      text: "What projects show your AI skills?", 
+      delayBefore: 2000, 
+      delayAfter: 6000 
+    },
+    { 
+      text: "Favorite anime?", 
+      delayBefore: 2000, 
+      delayAfter: 4000 
+    },
+    { 
+      text: "Show me Python skills", 
+      delayBefore: 2000, 
+      delayAfter: 5000 
+    },
+    { 
+      action: "mobile-test", 
+      delayBefore: 2000 
+    }
   ];
 
   let stepIndex = 0;
@@ -167,27 +183,43 @@ function runPortfolioDemo() {
     if (stepIndex >= demoSteps.length) return;
     
     const step = demoSteps[stepIndex];
-    setTimeout(() => {
+    
+    setTimeout(async () => {
       if (step.text) {
-        // Auto-type question
-        userInput.value = step.text;
+        // Auto-type question with character-by-character effect
+        userInput.value = "";
+        const text = step.text;
+        for (let i = 0; i < text.length; i++) {
+          await new Promise(r => setTimeout(r, 50));
+          userInput.value = text.substring(0, i+1);
+        }
+        
+        // Send and wait for response
         sendBtn.click();
-      } else if (step.action === "mobile-test") {
-        // Toggle mobile view
-        document.body.classList.toggle('mobile-preview');
-        alert("Switching to mobile view! Press OK to continue...");
+        
+        // Wait before next step
+        setTimeout(() => {
+          stepIndex++;
+          executeStep();
+        }, step.delayAfter);
+      } 
+      else if (step.action === "mobile-test") {
+        // Switch to mobile view
+        document.documentElement.classList.add('mobile-preview');
+        alert("Mobile preview activated!");
+        
+        stepIndex++;
+        executeStep();
       }
-      stepIndex++;
-      executeStep();
-    }, step.delay);
+    }, step.delayBefore);
   }
 
-  // Start demo after 2 seconds
-  setTimeout(executeStep, 2000);
+  // Start demo after initial delay
+  setTimeout(executeStep, 3000);
 }
 
 // Start demo when page loads
-window.addEventListener('load', runPortfolioDemo);  
+window.addEventListener('load', runPortfolioDemo);
 });
 
 
