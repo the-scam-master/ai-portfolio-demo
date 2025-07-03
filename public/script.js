@@ -159,13 +159,13 @@ function runPortfolioDemo() {
       text: "What projects show your AI skills?", 
       typingSpeed: 40,    // Milliseconds per character (lower = faster)
       waitBefore: 1000,   // Milliseconds to wait BEFORE typing starts
-      waitAfter: 5000     // Milliseconds to wait AFTER sending
+      waitAfter: 10000     // Milliseconds to wait AFTER sending
     },
     { 
       text: "Favorite anime?", 
       typingSpeed: 30,
       waitBefore: 4000,
-      waitAfter: 4000
+      waitAfter: 8000
     },
     { 
       text: "Show me your best data visualization project", 
