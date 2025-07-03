@@ -1,14 +1,18 @@
 import os
 import json
+import re
 from flask import Flask, request, jsonify, Response
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import google.generativeai as genai
 from dotenv import load_dotenv
-import re
+import logging
 
 load_dotenv()
 app = Flask(__name__)
+
+# Configure logging to avoid exposing sensitive data
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Initialize Flask-Limiter
 limiter = Limiter(
@@ -195,22 +199,52 @@ if not GEMINI_API_KEY:
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemma-3-27b-it")
 
+def sanitize_input(text):
+    """Sanitize input to remove potentially malicious characters."""
+    if not isinstance(text, str):
+        return ""
+    # Remove HTML-like tags and dangerous characters
+    return re.sub(r'[<>]', '', text.strip())
+
+def clean_response(text):
+    """Sanitize API response to remove HTML/script tags."""
+    if not isinstance(text, str):
+        return ""
+    # Remove script, style, iframe tags and their content
+    text = re.sub(r'<(script|style|iframe)[^>]*>.*?</\1>', '', text, flags=re.DOTALL)
+    # Remove any remaining HTML tags
+    text = re.sub(r'<[^>]+>', '', text)
+    return text
+
 def clean_markdown(text):
+    """Normalize Markdown link syntax and sanitize content."""
     text = re.sub(r'\[(.*?)\]\((.*?)\)', r'[\1](\2)', text)
     text = re.sub(r'\s*\[([^\]]*?)\]\s*\(\s*([^\)]*?)\s*\)', r'[\1](\2)', text)
-    return text
+    return sanitize_input(text)
+
+def validate_history(history):
+    """Validate conversation history to ensure correct format."""
+    if not isinstance(history, list):
+        return []
+    valid_history = []
+    for turn in history:
+        role = turn.get("role")
+        content = turn.get("content", "")
+        if role in ["user", "bot"] and isinstance(content, str) and len(content) <= 300:
+            valid_history.append({"role": role, "content": sanitize_input(content)})
+    return valid_history
 
 @app.route("/api/chat", methods=["POST"])
 @limiter.limit("20 per minute")  # Rate limit: 20 requests per minute per IP
 def chat():
     try:
         data = request.get_json()
-        user_message = data.get("message", "").strip()
-        history = data.get("history", [])
+        user_message = sanitize_input(data.get("message", "").strip())
+        history = validate_history(data.get("history", []))
 
         # Validate message length
         if not user_message:
-            return jsonify({"error": "Message field is required."}), 400
+            return jsonify({"error": "Message is required."}), 400
         if len(user_message) > 300:
             return jsonify({"error": "Message too long. Max 300 characters."}), 400
 
@@ -246,15 +280,16 @@ def chat():
                     if hasattr(chunk, "parts") and chunk.parts:
                         for part in chunk.parts:
                             if hasattr(part, "text") and part.text:
-                                cleaned_text = clean_markdown(part.text)
+                                cleaned_text = clean_response(clean_markdown(part.text))
                                 yield f"data: {json.dumps({'text': cleaned_text})}\n\n"
                 except Exception as stream_err:
-                    logging.error(f"[Chunk Error] {stream_err}")
+                    logging.error("[Chunk Error] %s", str(stream_err))
+                    yield f"data: {json.dumps({'error': 'Error processing response. Please try again.'})}\n\n"
 
         return Response(generate(), mimetype='text/event-stream')
 
     except Exception as e:
-        logging.error(f"[Server Error] {e}")
-        return jsonify({"error": "Internal server error"}), 500
+        logging.error("[Server Error] %s", str(e))
+        return jsonify({"error": "Something went wrong. Please try again."}), 500
 
 app_handler = app
