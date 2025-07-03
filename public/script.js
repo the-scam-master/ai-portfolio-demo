@@ -153,102 +153,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Add this to the bottom of your public/script.js file
 function runPortfolioDemo() {
+  // ===== CONFIGURATION =====
   const demoSteps = [
     { 
       text: "What projects show your AI skills?", 
-      typingDelay: 40,
-      beforeDelay: 1000,
-      afterDelay: 5000
+      typingSpeed: 40,    // Milliseconds per character (lower = faster)
+      waitBefore: 1000,   // Milliseconds to wait BEFORE typing starts
+      waitAfter: 5000     // Milliseconds to wait AFTER sending
     },
     { 
       text: "Favorite anime?", 
-      typingDelay: 30,
-      beforeDelay: 2000,
-      afterDelay: 4000
+      typingSpeed: 30,
+      waitBefore: 4000,
+      waitAfter: 4000
     },
     { 
       text: "Show me your best data visualization project", 
-      typingDelay: 35,
-      beforeDelay: 2000,
-      afterDelay: 6000
+      typingSpeed: 35,
+      waitBefore: 2000,
+      waitAfter: 6000
     }
   ];
+  // ===== END CONFIG =====
 
   let stepIndex = 0;
   const userInput = document.getElementById('user-input');
   const sendBtn = document.getElementById('send-btn');
-  
-  // Create minimalist cursor effect
-  const cursor = document.createElement('div');
-  cursor.className = 'type-cursor';
-  document.body.appendChild(cursor);
-  
-  function showCursor() {
-    cursor.style.display = 'block';
-  }
-  
-  function hideCursor() {
-    cursor.style.display = 'none';
-  }
   
   async function executeStep() {
     if (stepIndex >= demoSteps.length) return;
     
     const step = demoSteps[stepIndex];
     
-    // Initial delay before starting this step
-    await new Promise(r => setTimeout(r, step.beforeDelay));
+    // Wait before starting this step
+    await new Promise(r => setTimeout(r, step.waitBefore));
     
     // Clear input and type character by character
     userInput.value = "";
     const text = step.text;
     
-    showCursor();
     for (let i = 0; i < text.length; i++) {
+      await new Promise(r => setTimeout(r, step.typingSpeed));
       userInput.value = text.substring(0, i+1);
-      
-      // Position cursor at end of text
-      const inputRect = userInput.getBoundingClientRect();
-      cursor.style.left = `${inputRect.left + userInput.value.length * 8}px`;
-      cursor.style.top = `${inputRect.top}px`;
-      
-      await new Promise(r => setTimeout(r, step.typingDelay));
     }
-    hideCursor();
     
     // Send question
     sendBtn.click();
     
     // Wait after sending
-    await new Promise(r => setTimeout(r, step.afterDelay));
+    await new Promise(r => setTimeout(r, step.waitAfter));
     
     stepIndex++;
     executeStep();
   }
 
   // Start demo after initial delay
-  setTimeout(executeStep, 1500);
+  setTimeout(executeStep, 1000);
 }
-
-// Add cursor styles
-const cursorStyle = document.createElement('style');
-cursorStyle.textContent = `
-  .type-cursor {
-    position: fixed;
-    display: none;
-    width: 2px;
-    height: 24px;
-    background: #4ea6ff;
-    z-index: 1000;
-    animation: cursor-blink 1s infinite;
-  }
-  
-  @keyframes cursor-blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-`;
-document.head.appendChild(cursorStyle);
 
 // Start demo when page loads
 window.addEventListener('load', runPortfolioDemo);
