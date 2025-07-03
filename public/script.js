@@ -150,4 +150,44 @@ document.addEventListener('DOMContentLoaded', () => {
     'bot',
     "Hi! I'm an AI assistant representing **Tanmay Kalbande**.\n\nAsk me about his [projects](https://github.com/tanmay-kalbande?tab=repositories), skills, experience, or hobbies!"
   );
+
+function runPortfolioDemo() {
+  const demoSteps = [
+    { text: "What projects show your AI skills?", delay: 1000 },
+    { text: "Favorite anime?", delay: 3000 },
+    { text: "Show me Python skills", delay: 3000 },
+    { action: "mobile-test", delay: 4000 }
+  ];
+
+  let stepIndex = 0;
+  const userInput = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+  
+  function executeStep() {
+    if (stepIndex >= demoSteps.length) return;
+    
+    const step = demoSteps[stepIndex];
+    setTimeout(() => {
+      if (step.text) {
+        // Auto-type question
+        userInput.value = step.text;
+        sendBtn.click();
+      } else if (step.action === "mobile-test") {
+        // Toggle mobile view
+        document.body.classList.toggle('mobile-preview');
+        alert("Switching to mobile view! Press OK to continue...");
+      }
+      stepIndex++;
+      executeStep();
+    }, step.delay);
+  }
+
+  // Start demo after 2 seconds
+  setTimeout(executeStep, 2000);
+}
+
+// Start demo when page loads
+window.addEventListener('load', runPortfolioDemo);  
 });
+
+
