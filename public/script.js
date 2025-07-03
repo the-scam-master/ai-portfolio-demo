@@ -156,22 +156,21 @@ function runPortfolioDemo() {
   const demoSteps = [
     { 
       text: "What projects show your AI skills?", 
-      delayBefore: 2000, 
-      delayAfter: 6000 
+      typingDelay: 50,       // 50ms per character typing speed
+      beforeDelay: 2000,     // 2s before starting
+      afterDelay: 8000       // 8s after sending
     },
     { 
       text: "Favorite anime?", 
-      delayBefore: 2000, 
-      delayAfter: 4000 
+      typingDelay: 40,
+      beforeDelay: 3000,     // 3s before starting
+      afterDelay: 5000       // 5s after sending
     },
     { 
-      text: "Show me Python skills", 
-      delayBefore: 2000, 
-      delayAfter: 5000 
-    },
-    { 
-      action: "mobile-test", 
-      delayBefore: 2000 
+      text: "Show me your best data visualization project", 
+      typingDelay: 45,
+      beforeDelay: 3000,     // 3s before starting
+      afterDelay: 10000      // 10s after sending
     }
   ];
 
@@ -179,47 +178,111 @@ function runPortfolioDemo() {
   const userInput = document.getElementById('user-input');
   const sendBtn = document.getElementById('send-btn');
   
-  function executeStep() {
+  // Create typing indicator
+  const typingIndicator = document.createElement('div');
+  typingIndicator.className = 'typing-indicator';
+  typingIndicator.innerHTML = `
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  `;
+  document.body.appendChild(typingIndicator);
+  
+  function showTypingIndicator() {
+    typingIndicator.style.display = 'block';
+    typingIndicator.style.opacity = '1';
+  }
+  
+  function hideTypingIndicator() {
+    typingIndicator.style.opacity = '0';
+    setTimeout(() => {
+      typingIndicator.style.display = 'none';
+    }, 500);
+  }
+  
+  async function executeStep() {
     if (stepIndex >= demoSteps.length) return;
     
     const step = demoSteps[stepIndex];
     
-    setTimeout(async () => {
-      if (step.text) {
-        // Auto-type question with character-by-character effect
-        userInput.value = "";
-        const text = step.text;
-        for (let i = 0; i < text.length; i++) {
-          await new Promise(r => setTimeout(r, 50));
-          userInput.value = text.substring(0, i+1);
-        }
-        
-        // Send and wait for response
-        sendBtn.click();
-        
-        // Wait before next step
-        setTimeout(() => {
-          stepIndex++;
-          executeStep();
-        }, step.delayAfter);
-      } 
-      else if (step.action === "mobile-test") {
-        // Switch to mobile view
-        document.documentElement.classList.add('mobile-preview');
-        alert("Mobile preview activated!");
-        
-        stepIndex++;
-        executeStep();
-      }
-    }, step.delayBefore);
+    // Initial delay before starting this step
+    await new Promise(r => setTimeout(r, step.beforeDelay));
+    
+    showTypingIndicator();
+    
+    // Clear input and type character by character
+    userInput.value = "";
+    const text = step.text;
+    
+    for (let i = 0; i < text.length; i++) {
+      await new Promise(r => setTimeout(r, step.typingDelay));
+      userInput.value = text.substring(0, i+1);
+      
+      // Position indicator near input field
+      const inputRect = userInput.getBoundingClientRect();
+      typingIndicator.style.left = `${inputRect.left - 50}px`;
+      typingIndicator.style.top = `${inputRect.top - 40}px`;
+    }
+    
+    hideTypingIndicator();
+    
+    // Send question
+    sendBtn.click();
+    
+    // Wait after sending
+    await new Promise(r => setTimeout(r, step.afterDelay));
+    
+    stepIndex++;
+    executeStep();
   }
 
   // Start demo after initial delay
   setTimeout(executeStep, 3000);
 }
 
+// Add typing indicator styles
+const typingStyles = document.createElement('style');
+typingStyles.textContent = `
+  .typing-indicator {
+    position: fixed;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    background: rgba(30, 30, 30, 0.8);
+    padding: 8px 12px;
+    border-radius: 24px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  
+  .typing-indicator .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #4ea6ff;
+    border-radius: 50%;
+    margin: 0 3px;
+    animation: typing-bounce 1.4s infinite ease-in-out both;
+  }
+  
+  .typing-indicator .dot:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+  
+  .typing-indicator .dot:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+  
+  @keyframes typing-bounce {
+    0%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-8px); }
+  }
+`;
+document.head.appendChild(typingStyles);
+
 // Start demo when page loads
 window.addEventListener('load', runPortfolioDemo);
+
 });
 
 
