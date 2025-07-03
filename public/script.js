@@ -156,21 +156,21 @@ function runPortfolioDemo() {
   const demoSteps = [
     { 
       text: "What projects show your AI skills?", 
-      typingDelay: 50,       // 50ms per character typing speed
-      beforeDelay: 2000,     // 2s before starting
-      afterDelay: 8000       // 8s after sending
+      typingDelay: 40,
+      beforeDelay: 1000,
+      afterDelay: 5000
     },
     { 
       text: "Favorite anime?", 
-      typingDelay: 40,
-      beforeDelay: 3000,     // 3s before starting
-      afterDelay: 5000       // 5s after sending
+      typingDelay: 30,
+      beforeDelay: 2000,
+      afterDelay: 4000
     },
     { 
       text: "Show me your best data visualization project", 
-      typingDelay: 45,
-      beforeDelay: 3000,     // 3s before starting
-      afterDelay: 10000      // 10s after sending
+      typingDelay: 35,
+      beforeDelay: 2000,
+      afterDelay: 6000
     }
   ];
 
@@ -178,26 +178,17 @@ function runPortfolioDemo() {
   const userInput = document.getElementById('user-input');
   const sendBtn = document.getElementById('send-btn');
   
-  // Create typing indicator
-  const typingIndicator = document.createElement('div');
-  typingIndicator.className = 'typing-indicator';
-  typingIndicator.innerHTML = `
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-  `;
-  document.body.appendChild(typingIndicator);
+  // Create minimalist cursor effect
+  const cursor = document.createElement('div');
+  cursor.className = 'type-cursor';
+  document.body.appendChild(cursor);
   
-  function showTypingIndicator() {
-    typingIndicator.style.display = 'block';
-    typingIndicator.style.opacity = '1';
+  function showCursor() {
+    cursor.style.display = 'block';
   }
   
-  function hideTypingIndicator() {
-    typingIndicator.style.opacity = '0';
-    setTimeout(() => {
-      typingIndicator.style.display = 'none';
-    }, 500);
+  function hideCursor() {
+    cursor.style.display = 'none';
   }
   
   async function executeStep() {
@@ -208,23 +199,22 @@ function runPortfolioDemo() {
     // Initial delay before starting this step
     await new Promise(r => setTimeout(r, step.beforeDelay));
     
-    showTypingIndicator();
-    
     // Clear input and type character by character
     userInput.value = "";
     const text = step.text;
     
+    showCursor();
     for (let i = 0; i < text.length; i++) {
-      await new Promise(r => setTimeout(r, step.typingDelay));
       userInput.value = text.substring(0, i+1);
       
-      // Position indicator near input field
+      // Position cursor at end of text
       const inputRect = userInput.getBoundingClientRect();
-      typingIndicator.style.left = `${inputRect.left - 50}px`;
-      typingIndicator.style.top = `${inputRect.top - 40}px`;
+      cursor.style.left = `${inputRect.left + userInput.value.length * 8}px`;
+      cursor.style.top = `${inputRect.top}px`;
+      
+      await new Promise(r => setTimeout(r, step.typingDelay));
     }
-    
-    hideTypingIndicator();
+    hideCursor();
     
     // Send question
     sendBtn.click();
@@ -237,48 +227,28 @@ function runPortfolioDemo() {
   }
 
   // Start demo after initial delay
-  setTimeout(executeStep, 3000);
+  setTimeout(executeStep, 1500);
 }
 
-// Add typing indicator styles
-const typingStyles = document.createElement('style');
-typingStyles.textContent = `
-  .typing-indicator {
+// Add cursor styles
+const cursorStyle = document.createElement('style');
+cursorStyle.textContent = `
+  .type-cursor {
     position: fixed;
     display: none;
-    opacity: 0;
-    transition: opacity 0.3s;
-    background: rgba(30, 30, 30, 0.8);
-    padding: 8px 12px;
-    border-radius: 24px;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  }
-  
-  .typing-indicator .dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 2px;
+    height: 24px;
     background: #4ea6ff;
-    border-radius: 50%;
-    margin: 0 3px;
-    animation: typing-bounce 1.4s infinite ease-in-out both;
+    z-index: 1000;
+    animation: cursor-blink 1s infinite;
   }
   
-  .typing-indicator .dot:nth-child(1) {
-    animation-delay: -0.32s;
-  }
-  
-  .typing-indicator .dot:nth-child(2) {
-    animation-delay: -0.16s;
-  }
-  
-  @keyframes typing-bounce {
-    0%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-8px); }
+  @keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
   }
 `;
-document.head.appendChild(typingStyles);
+document.head.appendChild(cursorStyle);
 
 // Start demo when page loads
 window.addEventListener('load', runPortfolioDemo);
