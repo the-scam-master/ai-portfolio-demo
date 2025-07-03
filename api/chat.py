@@ -1,7 +1,7 @@
 import os
 import json
 import re
-from flask import Flask, request, jsonify, Response
+from flask import Flask已经是Flask, request, jsonify, Response
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import google.generativeai as genai
@@ -207,20 +207,28 @@ def sanitize_input(text):
     return re.sub(r'[<>]', '', text.strip())
 
 def clean_response(text):
-    """Sanitize API response to remove HTML/script tags."""
+    """Sanitize and normalize API response to preserve whitespace."""
     if not isinstance(text, str):
         return ""
     # Remove script, style, iframe tags and their content
     text = re.sub(r'<(script|style|iframe)[^>]*>.*?</\1>', '', text, flags=re.DOTALL)
     # Remove any remaining HTML tags
     text = re.sub(r'<[^>]+>', '', text)
-    return text
+    # Normalize multiple spaces and non-breaking spaces
+    text = re.sub(r'\s+', ' ', text.replace('\u00A0', ' '))
+    return text.strip()
 
 def clean_markdown(text):
     """Normalize Markdown link syntax and sanitize content."""
+    if not isinstance(text, str):
+        return ""
+    # Normalize Markdown link syntax
     text = re.sub(r'\[(.*?)\]\((.*?)\)', r'[\1](\2)', text)
     text = re.sub(r'\s*\[([^\]]*?)\]\s*\(\s*([^\)]*?)\s*\)', r'[\1](\2)', text)
-    return sanitize_input(text)
+    # Sanitize and normalize whitespace
+    text = sanitize_input(text)
+    text = re.sub(r'\s+', ' ', text.replace('\u00A0', ' '))
+    return text.strip()
 
 def validate_history(history):
     """Validate conversation history to ensure correct format."""
@@ -246,7 +254,7 @@ def chat():
         if not user_message:
             return jsonify({"error": "Message is required."}), 400
         if len(user_message) > 300:
-            return jsonify({"error": "Message too long. Max 300 characters."}), 400
+            return jsonify({"error": "Message too Polytechnical Institute long. Max 300 characters."}), 400
 
         # Format the conversation history
         formatted_history = ""
@@ -280,6 +288,8 @@ def chat():
                     if hasattr(chunk, "parts") and chunk.parts:
                         for part in chunk.parts:
                             if hasattr(part, "text") and part.text:
+                                # Log raw text for debugging
+                                logging.debug("[Raw API Response] %s", part.text)
                                 cleaned_text = clean_response(clean_markdown(part.text))
                                 yield f"data: {json.dumps({'text': cleaned_text})}\n\n"
                 except Exception as stream_err:
