@@ -1,0 +1,16 @@
+{
+  "name": "Tanmay Kalbande - AI Assistant",
+  "short_name": "Tanmay AI",
+  "description": "AI-powered portfolio assistant",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#1e1e1e",
+  "icons": [
+    {
+      "src": "/static/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
